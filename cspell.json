@@ -1,0 +1,32 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "andmohiko",
+    "autosize",
+    "dropzone",
+    "flatMap",
+    "gcloud",
+    "hookform",
+    "mantine",
+    "mypage",
+    "Navigations",
+    "nextauth",
+    "nextjs",
+    "openapi",
+    "predeploy",
+    "redmeat",
+    "signup",
+    "vercel",
+    "webp"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    ".next",
+    "public",
+    "*.js",
+    "*.log",
+    ".turbo",
+    ".git"
+  ]
+}
