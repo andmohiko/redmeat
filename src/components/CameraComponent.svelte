@@ -18,7 +18,7 @@
 
   async function startVideo() {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined } });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined, facingMode: selectedDeviceId ? undefined : 'environment' } });
       video.srcObject = stream;
       video.addEventListener('loadedmetadata', () => {
         video.play();
@@ -122,7 +122,9 @@
       const deviceInfos = await navigator.mediaDevices.enumerateDevices();
       devices = deviceInfos.filter(device => device.kind === 'videoinput');
       if (devices.length > 0) {
-        selectedDeviceId = devices[0].deviceId;
+        // デフォルトで背面カメラを選択するように試みる
+        const backCamera = devices.find(device => device.label.toLowerCase().includes('back'));
+        selectedDeviceId = backCamera ? backCamera.deviceId : devices[0].deviceId;
       }
     } catch (err) {
       console.error("デバイスの取得に失敗しました:", err);
