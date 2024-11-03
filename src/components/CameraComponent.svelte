@@ -8,8 +8,17 @@
   let stopProcessing = false;
 
   onMount(async () => {
+    await getVideoDevices();
+    await startVideo();
+  });
+
+  $: if (selectedDeviceId) {
+    startVideo();
+  }
+
+  async function startVideo() {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined } });
       video.srcObject = stream;
       video.addEventListener('loadedmetadata', () => {
         video.play();
@@ -20,7 +29,8 @@
     } catch (err) {
       console.error("カメラへのアクセスが拒否されました:", err);
     }
-  });
+  }
+
 
   function processFrame() {
     if (stopProcessing) return;
@@ -103,11 +113,41 @@
   function isRed(r: number, g: number, b: number) {
     return r > 100 && g <= 70 && b <= 70;
   }
+
+  let devices: MediaDeviceInfo[] = [];
+  let selectedDeviceId = '';
+
+  async function getVideoDevices() {
+    try {
+      const deviceInfos = await navigator.mediaDevices.enumerateDevices();
+      devices = deviceInfos.filter(device => device.kind === 'videoinput');
+      if (devices.length > 0) {
+        selectedDeviceId = devices[0].deviceId;
+      }
+    } catch (err) {
+      console.error("デバイスの取得に失敗しました:", err);
+    }
+  }
+
+  function handleDeviceChange(event: Event) {
+    selectedDeviceId = (event.target as HTMLSelectElement).value;
+    stopFrameProcessing();
+    startVideo().then(() => {
+      stopProcessing = false;
+      requestAnimationFrame(processFrame);
+    });
+  }
+
 </script>
 
 <video bind:this={video} autoplay playsinline style="object-fit: cover; width: 100vw; height: 100vh;">
   <track kind="captions" srclang="en" label="English captions">
 </video>
+<select on:change={handleDeviceChange} style="position: absolute; top: 10px; left: 300px; z-index: 2;">
+  {#each devices as device}
+    <option value={device.deviceId} selected={device.deviceId === selectedDeviceId}>{device.label || 'カメラ ' + (devices.indexOf(device) + 1)}</option>
+  {/each}
+</select>
 <canvas bind:this={canvas} style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1;"></canvas>
 <button on:click={() => requestAnimationFrame(processFrame)} style="position: absolute; top: 10px; left: 10px; z-index: 2;">赤色の割合を計算</button>
 <button on:click={stopFrameProcessing} style="position: absolute; top: 10px; left: 150px; z-index: 2;">赤色の検知を停止</button>
