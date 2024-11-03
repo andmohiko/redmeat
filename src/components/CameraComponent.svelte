@@ -31,7 +31,6 @@
     }
   }
 
-
   function processFrame() {
     if (stopProcessing) return;
     const context = canvas.getContext('2d');
@@ -42,6 +41,11 @@
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
     highlightRedAreas();
     calculateRedPercentage();
+    requestAnimationFrame(processFrame);
+  }
+
+  function startFrameProcessing() {
+    stopProcessing = false;
     requestAnimationFrame(processFrame);
   }
 
@@ -101,9 +105,9 @@
         data[i + 2] = 0;   // 青
       } else {
         // 赤色でない部分は少し暗くする
-        data[i] *= 0.9;
-        data[i + 1] *= 0.9;
-        data[i + 2] *= 0.9;
+        data[i] *= 0.8;
+        data[i + 1] *= 0.8;
+        data[i + 2] *= 0.8;
       }
     }
 
@@ -142,22 +146,70 @@
 
 </script>
 
-<video bind:this={video} autoplay playsinline style="object-fit: cover; width: 100vw; height: 100vh;">
+<video bind:this={video} class="video">
   <track kind="captions" srclang="en" label="English captions">
 </video>
-<select on:change={handleDeviceChange} style="position: absolute; top: 10px; left: 300px; z-index: 2;">
+<select on:change={handleDeviceChange} class="device-select">
   {#each devices as device}
     <option value={device.deviceId} selected={device.deviceId === selectedDeviceId}>{device.label || 'カメラ ' + (devices.indexOf(device) + 1)}</option>
   {/each}
 </select>
-<canvas bind:this={canvas} style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1;"></canvas>
-<button on:click={() => requestAnimationFrame(processFrame)} style="position: absolute; top: 10px; left: 10px; z-index: 2;">赤色の割合を計算</button>
-<button on:click={stopFrameProcessing} style="position: absolute; top: 10px; left: 150px; z-index: 2;">赤色の検知を停止</button>
-<p style="position: absolute; top: 50px; left: 10px; z-index: 2; background: rgba(255, 255, 255, 0.7); padding: 5px;">赤色の割合: {redPercentage.toFixed(2)}%</p>
+<canvas bind:this={canvas} class="canvas"></canvas>
+<button on:click={startFrameProcessing} class="start-button">赤色の割合を計算</button>
+<button on:click={stopFrameProcessing} class="stop-button">赤色の検知を停止</button>
+<p class="red-percentage">赤色の割合: {redPercentage.toFixed(2)}%</p>
 
 <style>
   :global(body) {
     margin: 0;
     overflow: hidden;
+  }
+  .video {
+    object-fit: cover;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100%;
+    max-height: 100%;
+  }
+  .device-select {
+    position: absolute;
+    top: 10px;
+    left: 300px;
+    font-size: 14px;
+    padding: 4px 8px;
+    z-index: 2;
+  }
+  .canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100%;
+    max-height: 100%;
+    z-index: 1;
+  }
+  .start-button,
+  .stop-button {
+    position: absolute;
+    font-size: 14px;
+    padding: 4px 8px;
+    z-index: 2;
+  }
+  .start-button {
+    top: 10px;
+    left: 10px;
+  }
+  .stop-button {
+    top: 10px;
+    left: 150px;
+  }
+  .red-percentage {
+    position: absolute;
+    top: 50px;
+    left: 10px;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.7);
+    padding: 5px;
   }
 </style>
