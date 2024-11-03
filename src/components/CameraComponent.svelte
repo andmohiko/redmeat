@@ -114,6 +114,7 @@
     context.putImageData(imageData, 0, 0);
   }
 
+  // TODO: 実際に焼き肉を食べながら閾値を調整する
   function isRed(r: number, g: number, b: number) {
     return r > 150 && g <= 110 && b <= 110;
   }
