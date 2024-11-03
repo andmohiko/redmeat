@@ -115,7 +115,7 @@
   }
 
   function isRed(r: number, g: number, b: number) {
-    return r > 100 && g <= 70 && b <= 70;
+    return r > 100 && g <= 80 && b <= 80;
   }
 
   let devices: MediaDeviceInfo[] = [];
