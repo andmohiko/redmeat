@@ -1,6 +1,7 @@
 <!-- CameraComponent.svelte -->
 <script lang="ts">
   import { onMount } from 'svelte';
+  import ControlButtons from './ControlButtons.svelte'
 
   let video: HTMLVideoElement;
   let canvas: HTMLCanvasElement;
@@ -156,8 +157,7 @@
   {/each}
 </select>
 <canvas bind:this={canvas} class="canvas"></canvas>
-<button on:click={startFrameProcessing} class="start-button">赤色の割合を計算</button>
-<button on:click={stopFrameProcessing} class="stop-button">赤色の検知を停止</button>
+<ControlButtons on:start={startFrameProcessing} on:stop={stopFrameProcessing} />
 <p class="red-percentage">赤色の割合: {redPercentage.toFixed(2)}%</p>
 
 <style>
@@ -189,21 +189,6 @@
     max-width: 100%;
     max-height: 100%;
     z-index: 1;
-  }
-  .start-button,
-  .stop-button {
-    position: absolute;
-    font-size: 14px;
-    padding: 4px 8px;
-    z-index: 2;
-  }
-  .start-button {
-    top: 10px;
-    left: 10px;
-  }
-  .stop-button {
-    top: 10px;
-    left: 150px;
   }
   .red-percentage {
     position: absolute;
